@@ -1,22 +1,32 @@
 import "@/index.css";
 import Header from "@/components/header";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useUser } from "../context/AuthContext";
 import { addUser } from "../api/v1";
 import { profileSchema } from "@/schema/profile-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useWatch } from "react-hook-form";
-import FormInput from "@/components/form-input";
-import FormSelect from "@/components/form-select";
-import FormDatePicker from "@/components/form-date-picker";
-import FormInput2 from "@/components/form-input-2";
+import { useForm } from "react-hook-form";
 
 export default function AccountInfo() {
   const navigate = useNavigate();
 
   const { user } = useUser();
 
+  const [heightUnit, setHeightUnit] = useState("in");
+  const [weightUnit, setWeightUnit] = useState("lbs");
+  const [waistUnit, setWaistUnit] = useState("in");
+  const [targetWeightUnit, setTargetWeightUnit] = useState("lbs");
+  const [name, setName] = useState("");
+  const [gender, setGender] = useState("");
+  const [birthdate, setBirthdate] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [waist, setWaist] = useState("");
+  const [weightTarget, setWeightTarget] = useState("");
+  const [bodyFat, setBodyFat] = useState("");
   const [bodyImages, setBodyImages] = useState({
     front: null,
     side: null,
@@ -26,40 +36,11 @@ export default function AccountInfo() {
   const form = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: "",
       email: "",
-      phone: "",
-      birthdate: "",
-      sex: "",
-      height: 0,
-      heightUnit: "cm",
-      weight: 0,
-      weightTarget: 0,
-      weightUnit: "kg",
-      waist: 0,
-      waistUnit: "cm",
+      password: "",
+      agree: false,
     },
   });
-
-  const heightUnit = useWatch({
-    control: form.control,
-    name: "heightUnit",
-  });
-
-  const weightUnit = useWatch({
-    control: form.control,
-    name: "weightUnit",
-  });
-
-  const waistUnit = useWatch({
-    control: form.control,
-    name: "waistUnit",
-  });
-
-  useEffect(() => {
-    form.setValue("name", user.name);
-    form.setValue("email", user.email);
-  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // prevent page reload
@@ -132,24 +113,6 @@ export default function AccountInfo() {
     }));
   };
 
-  const toggleHeightUnit = () => {
-    form.setValue("heightUnit", heightUnit === "inch" ? "cm" : "inch", {
-      shouldDirty: true,
-    });
-  };
-
-  const toggleWeightUnit = () => {
-    form.setValue("weightUnit", weightUnit === "lbs" ? "kg" : "lbs", {
-      shouldDirty: true,
-    });
-  };
-
-  const toggleWaistUnit = () => {
-    form.setValue("waistUnit", waistUnit === "inch" ? "cm" : "inch", {
-      shouldDirty: true,
-    });
-  };
-
   return (
     <>
       <Header />
@@ -200,48 +163,51 @@ export default function AccountInfo() {
               </p>
 
               <div className="form-grid">
-                <FormInput
-                  label="Full name"
-                  name="name"
-                  control={form.control}
-                  type="text"
-                  placeholder="Enter your full name"
-                  disabled={true}
-                />
+                <div>
+                  <label>Full name</label>
+                  <input
+                    value={user?.name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Enter your name"
+                    disabled={true}
+                  />
+                </div>
 
-                <FormSelect
-                  label="Gender"
-                  name="sex"
-                  control={form.control}
-                  options={[
-                    { value: "male", label: "Male" },
-                    { value: "female", label: "Female" },
-                  ]}
-                />
+                <div>
+                  <label>Gender</label>
+                  <select onChange={(e) => setGender(e.target.value)}>
+                    <option>Pick one option</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
 
-                <FormDatePicker
-                  label="Date of birth"
-                  name="birthdate"
-                  control={form.control}
-                  placeholder="MM/DD/YY"
-                />
+                <div>
+                  <label>Birthday</label>
+                  <input
+                    onChange={(e) => setBirthdate(e.target.value)}
+                    type="date"
+                    placeholder="MM/DD/YY"
+                  />
+                </div>
 
-                <FormInput
-                  label="Phone number"
-                  name="phone"
-                  control={form.control}
-                  type="text"
-                  placeholder=""
-                />
+                <div>
+                  <label>Phone number</label>
+                  <input
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+00"
+                  />
+                </div>
 
-                <FormInput
-                  label="Email"
-                  name="email"
-                  control={form.control}
-                  type="email"
-                  placeholder="youremail@gmail.com"
-                  disabled={true}
-                />
+                <div>
+                  <label>Email</label>
+                  <input
+                    value={user?.email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="youremail@gmail.com"
+                    disabled={true}
+                  />
+                </div>
               </div>
             </section>
 
@@ -254,59 +220,98 @@ export default function AccountInfo() {
 
               <div className="form-grid">
                 {/* HEIGHT */}
-                <FormInput2
-                  label="Height"
-                  name="height"
-                  control={form.control}
-                  type="text"
-                  placeholder="0.00"
-                  onClick={toggleHeightUnit}
-                  unit={heightUnit}
-                />
-
-                {/* BODY FAT */}
-                <FormInput2
-                  label="Body fat percentage %"
-                  name="bodyFat"
-                  control={form.control}
-                  type="text"
-                  placeholder="0.00"
-                  onClick={null}
-                  unit="%"
-                />
-
-                {/* WAIST */}
-                <FormInput2
-                  label="Waist Measurement"
-                  name="waist"
-                  control={form.control}
-                  type="text"
-                  placeholder="0.00"
-                  onClick={toggleWaistUnit}
-                  unit={waistUnit}
-                />
+                <div>
+                  <label>Height</label>
+                  <div className="input-with-unit">
+                    <input
+                      onChange={(e) => setHeight(e.target.value)}
+                      placeholder="00"
+                    />
+                    <button
+                      type="button"
+                      className="unit-btn"
+                      onClick={() =>
+                        setHeightUnit(heightUnit === "in" ? "cm" : "in")
+                      }
+                    >
+                      {heightUnit === "in" ? "Inch" : "CM"}
+                    </button>
+                  </div>
+                </div>
 
                 {/* WEIGHT */}
-                <FormInput2
-                  label="Weight"
-                  name="weight"
-                  control={form.control}
-                  type="text"
-                  placeholder="0.00"
-                  onClick={toggleWeightUnit}
-                  unit={weightUnit}
-                />
+                <div>
+                  <label>Weight</label>
+                  <div className="input-with-unit">
+                    <input
+                      onChange={(e) => setWeight(e.target.value)}
+                      placeholder="00"
+                    />
+                    <button
+                      type="button"
+                      className="unit-btn"
+                      onClick={() =>
+                        setWeightUnit(weightUnit === "lbs" ? "kg" : "lbs")
+                      }
+                    >
+                      {weightUnit === "lbs" ? "Lbs" : "Kg"}
+                    </button>
+                  </div>
+                </div>
+
+                {/* WAIST */}
+                <div>
+                  <label>Waist Measurement</label>
+                  <div className="input-with-unit">
+                    <input
+                      onChange={(e) => setWaist(e.target.value)}
+                      placeholder="00"
+                    />
+                    <button
+                      type="button"
+                      className="unit-btn"
+                      onClick={() =>
+                        setWaistUnit(waistUnit === "in" ? "cm" : "in")
+                      }
+                    >
+                      {waistUnit === "in" ? "Inch" : "CM"}
+                    </button>
+                  </div>
+                </div>
 
                 {/* TARGET WEIGHT */}
-                <FormInput2
-                  label="Target weight"
-                  name="weightTarget"
-                  control={form.control}
-                  type="text"
-                  placeholder="0.00"
-                  onClick={toggleWeightUnit}
-                  unit={weightUnit}
-                />
+                <div>
+                  <label>Target weight</label>
+                  <div className="input-with-unit">
+                    <input
+                      onChange={(e) => setWeightTarget(e.target.value)}
+                      placeholder="00"
+                    />
+                    <button
+                      type="button"
+                      className="unit-btn"
+                      onClick={() =>
+                        setTargetWeightUnit(
+                          targetWeightUnit === "lbs" ? "kg" : "lbs"
+                        )
+                      }
+                    >
+                      {targetWeightUnit === "lbs" ? "Lbs" : "Kg"}
+                    </button>
+                  </div>
+                </div>
+
+                {/* BODY FAT */}
+                <div>
+                  <label>Body fat percentage %</label>
+                  <div className="input-with-unit">
+                    <input
+                      onChange={(e) => setBodyFat(e.target.value)}
+                      placeholder="00"
+                    />
+                    <span className="unit-static">%</span>
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -351,7 +356,7 @@ export default function AccountInfo() {
             {/* ACTIONS */}
             <div className="form-actions">
               <button className="btn-secondary">Reset</button>
-              <button className="btn-primary" type="submit">
+              <button className="btn-primary" onClick={handleSubmit}>
                 Next
               </button>
             </div>
