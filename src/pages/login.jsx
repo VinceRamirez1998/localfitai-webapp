@@ -88,7 +88,8 @@ export default function Login() {
 
           <p>
             Start with a simple survey and unlock a fitness journey built around
-            you — with a partner that guides you every step.
+            you — with a partner that guides you every step. 
+            (testing) (testing)
           </p>
         </div>
       </div>
